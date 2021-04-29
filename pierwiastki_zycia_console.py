@@ -1,6 +1,27 @@
 import os
-from database.create_database import create_from_txt, set_teams, set_team_points
-from database import database_analysis
+from database.create_database import *
+from database.database_analysis import *
+
+
+def edit_students():
+    if not os.path.exists('pierwiastki_zycia.db'):
+        print('Baza danych jest pusta nie można edytować!')
+        return
+
+    student_list = base_content()
+    print('LISTA UCZNIÓW:')
+
+    for id, info in enumerate(student_list):
+        print(f'{id + 1}. {info[0]} {info[1]}')
+
+    while True:
+        print('Wybierz indeks, który chcesz edytować:')
+        idx = input('>>>')
+
+        if idx == 'stop':
+            break
+
+        edit_record(int(idx))
 
 
 def make_analysis():
@@ -13,9 +34,9 @@ def make_analysis():
         points = {}
 
         for group in range(groups):
-            print(f'Podaj ilość punktów dla zespołu {group+1}:')
+            print(f'Podaj ilość punktów dla zespołu {group + 1}:')
             pts = int(input('>>>'))
-            points[group+1] = pts
+            points[group + 1] = pts
 
         set_team_points(points)
 
@@ -28,10 +49,10 @@ def make_analysis():
     print('=' * 16)
     print()
     print('* NAJLEPSZY TEST:')
-    database_analysis.highest_score_test(n)
+    highest_score_test(n)
     print()
     print('* NAJLEPSZY WYNIK OGÓLNY:')
-    database_analysis.highest_score_total(n)
+    highest_score_total(n)
 
 
 print('WITAJ W PROGRAMIE PIERWIASTKI ŻYCIA!')
@@ -41,7 +62,7 @@ option = input('>>> ')
 if int(option) == 1:
     make_analysis()
 elif int(option) == 2:
-    pass
+    edit_students()
 elif int(option) == 3:
     exit(0)
 else:

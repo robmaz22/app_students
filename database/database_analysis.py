@@ -1,6 +1,16 @@
 import sqlite3
 
 
+def base_content():
+    con = sqlite3.connect('pierwiastki_zycia.db')
+    cur = con.cursor()
+
+    cur.execute('''SELECT name, sname FROM students''')
+    students_list = cur.fetchall()
+
+    return students_list
+
+
 def highest_score_test(n=3):
     con = sqlite3.connect('pierwiastki_zycia.db')
     cur = con.cursor()

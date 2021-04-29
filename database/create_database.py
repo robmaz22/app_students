@@ -63,3 +63,23 @@ def set_team_points(points_dict):
 
     con.commit()
     con.close()
+
+def edit_record(idx):
+    con = sqlite3.connect('pierwiastki_zycia.db')
+    cur = con.cursor()
+
+    cur.execute(f'''SELECT * FROM students WHERE id == {idx-1}''')
+    info = cur.fetchone()
+
+    print('WYBRANY REKORD:')
+    print(f'''* Imię: {info[1]}
+* Nazwisko: {info[2]}
+* Klasa: {info[3]}
+* Szkoła: {info[4]}
+* Punkty test: {info[5]}
+* Punkty praca: {info[6]}
+* Zespół: {info[7]}
+* Punkty dla zespołu: {info[8]}''')
+
+    con.commit()
+    con.close()
