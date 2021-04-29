@@ -1,16 +1,29 @@
 import os
-from database.create_database import create_from_txt
+from database.create_database import create_from_txt, set_teams, set_team_points
 from database import database_analysis
 
 
 def make_analysis():
     if not os.path.exists('pierwiastki_zycia.db'):
         create_from_txt('students.txt')
+        print('Podaj liczbę zespołów:')
+        groups = int(input('>>> '))
+        set_teams(groups)
 
-    print('Ile miejsc?')
+        points = {}
+
+        for group in range(groups):
+            print(f'Podaj ilość punktów dla zespołu {group+1}:')
+            pts = int(input('>>>'))
+            points[group+1] = pts
+
+        set_team_points(points)
+
+    print('[INFO] ROZPOCZĘCIE ANALIZY...')
+    print('Ile miejsc wyświetlić?')
     n = int(input('>>> '))
 
-    print('='*16)
+    print('=' * 16)
     print('UZYSKANE WYNIKI:')
     print('=' * 16)
     print()

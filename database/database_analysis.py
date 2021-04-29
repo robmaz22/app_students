@@ -26,15 +26,15 @@ def highest_score_total(n=3):
     cur = con.cursor()
 
     cur.execute('''SELECT 
-    name, sname, school, test, work
+    name, sname, school, test, work, t_points
     FROM students
-    ORDER BY (test + work) DESC''')
+    ORDER BY (test + work + t_points) DESC''')
 
     results = cur.fetchall()
 
     for idx in range(n):
         print(idx + 1, 'MIEJSCE:')
-        total = int(results[idx][3]) + int(results[idx][4])
+        total = int(results[idx][3]) + int(results[idx][4]) + int(results[idx][5])
 
         print(f'\t{results[idx][0]} {results[idx][1]} ({results[idx][2]})\n\t{total} punktów')
         print('-' * 15)
