@@ -1,30 +1,38 @@
 import tkinter as tk
 
+def create_new():
+    welcome_frame.pack_forget()
+    create_frame = tk.Frame(root, bg='yellow')
+    create_frame.pack(fill='both', expand=1)
+    new_button = tk.Button(create_frame, text='Wczytaj z pliku...')
+    new_button.pack(pady=30)
+    read_button =tk.Button(create_frame, text='Stwórz ręcznie')
+    read_button.pack()
 
-window = tk.Tk()
-window.title('Pierwiastk życia')
-window.geometry('440x170')
+root = tk.Tk()
+root.title('Pierwiastk życia')
+root.geometry('440x170')
 
-title_label = tk.Label(text="WITAJ W PROGRAMIE PIERWIASTKI ŻYCIA")
-title_label.config(font=("Cantarell 15 bold"))
-title_label.pack(pady=15, padx=20)
-
-create_button = tk.Button(text='Utwórz nową bazę danych', )
-create_button.pack(pady=5)
-open_button = tk.Button(text='Otwórz istniejącą bazę danych')
-open_button.pack(pady=5)
-
-menu_bar = tk.Menu(window)
+menu_bar = tk.Menu(root)
 option_menu = tk.Menu(menu_bar, tearoff=0)
 option_menu.add_command(label="Ustawienia")
 menu_bar.add_cascade(label="Opcje", menu=option_menu)
-
 helpmenu = tk.Menu(menu_bar, tearoff=0)
 helpmenu.add_command(label="Jak korzystać?")
 helpmenu.add_command(label="O programie...")
 menu_bar.add_cascade(label="Pomoc", menu=helpmenu)
 
-window.config(menu=menu_bar)
+root.config(menu=menu_bar)
+
+welcome_frame = tk.Frame(root, bg='yellow')
+welcome_frame.pack()
+title_label = tk.Label(welcome_frame, text="WITAJ W PROGRAMIE PIERWIASTKI ŻYCIA", bg='green')
+title_label.config(font=("Cantarell 15 bold"))
+title_label.pack(pady=15, padx=20)
+create_button = tk.Button(welcome_frame, text='Utwórz nową bazę danych', command=create_new)
+create_button.pack(pady=5)
+open_button = tk.Button(welcome_frame, text='Otwórz istniejącą bazę danych')
+open_button.pack(pady=5)
 
 
-window.mainloop()
+root.mainloop()
