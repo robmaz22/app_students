@@ -7,13 +7,13 @@ def create_from_txt(path_to_txt):
     cur = con.cursor()
 
     cur.execute('''CREATE TABLE students
-                   (id, name, sname, class, school, test, work)''')
+                   (id, name, lname, class, school, test, work)''')
 
     with open(path_to_txt) as file:
         content = file.readlines()
-        for id, line in enumerate(content):
+        for student_id, line in enumerate(content):
             info = line.replace('\n', '').split(',')
-            info.insert(0, id)
+            info.insert(0, str(student_id))
             cur.execute(f"INSERT INTO students VALUES {tuple(info)}")
 
     con.commit()
@@ -43,8 +43,8 @@ def set_teams(n=5):
 
     for id, team in enumerate(teams):
         cur.execute(f'''UPDATE students
-                        SET team = {team}
-                        WHERE id = {id}''')
+                        SET team = "{team}"
+                        WHERE id = "{id}"''')
 
     con.commit()
     con.close()
@@ -58,20 +58,49 @@ def set_team_points(points_dict):
 
     for group, pts in points_dict.items():
         cur.execute(f'''UPDATE students
-                        SET t_points = {pts}
+                        SET t_points = "{pts}"
                         WHERE team = {group}''')
 
     con.commit()
     con.close()
 
+
 def edit_record(idx):
     con = sqlite3.connect('pierwiastki_zycia.db')
     cur = con.cursor()
 
-    cur.execute(f'''SELECT * FROM students WHERE id == {idx-1}''')
+    cur.execute(f'''SELECT * FROM students WHERE id == "{idx-1}"''')
     info = cur.fetchone()
 
     print('WYBRANY REKORD:')
+    print(f'''* Imię: {info[1]}
+* Nazwisko: {info[2]}
+* Klasa: {info[3]}
+* Szkoła: {info[4]}
+* Punkty test: {info[5]}
+* Punkty praca: {info[6]}
+* Zespół: {info[7]}
+* Punkty dla zespołu: {info[8]}''')
+
+    print('Podaj nowe wartości (imię nazwisko klasa szkoła punkty_test punty_praca zespół punkty_zespołu):')
+    new_student = input('>>> ')
+    record = new_student.split(' ')
+
+    cur.execute(f'''UPDATE students
+SET name = "{record[0]}",
+lname = "{record[1]}",
+class = "{record[2]}",
+school = "{record[3]}",
+test = "{record[4]}",
+work = "{record[5]}",
+team = "{record[6]}",
+t_points = "{record[7]}"
+WHERE id = "{idx-1}"''')
+
+    cur.execute(f'''SELECT * FROM students WHERE id == "{idx - 1}"''')
+    info = cur.fetchone()
+
+    print('UTWORZONY REKORD:')
     print(f'''* Imię: {info[1]}
 * Nazwisko: {info[2]}
 * Klasa: {info[3]}
