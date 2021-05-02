@@ -2,7 +2,7 @@ import sqlite3
 
 
 def base_content():
-    con = sqlite3.connect('pierwiastki_zycia.db')
+    con = sqlite3.connect('students.db')
     cur = con.cursor()
 
     cur.execute('''SELECT name, lname FROM students''')
@@ -12,7 +12,7 @@ def base_content():
 
 
 def highest_score_test(n=3):
-    con = sqlite3.connect('pierwiastki_zycia.db')
+    con = sqlite3.connect('students.db')
     cur = con.cursor()
 
     cur.execute('''SELECT 
@@ -32,7 +32,7 @@ def highest_score_test(n=3):
 
 
 def highest_score_total(n=3):
-    con = sqlite3.connect('pierwiastki_zycia.db')
+    con = sqlite3.connect('students.db')
     cur = con.cursor()
 
     cur.execute('''SELECT 

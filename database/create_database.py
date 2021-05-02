@@ -3,7 +3,7 @@ import random
 
 
 def create_from_txt(path_to_txt):
-    con = sqlite3.connect('pierwiastki_zycia.db')
+    con = sqlite3.connect('students.db')
     cur = con.cursor()
 
     cur.execute('''CREATE TABLE students
@@ -21,7 +21,7 @@ def create_from_txt(path_to_txt):
 
 
 def set_teams(n=5):
-    con = sqlite3.connect('pierwiastki_zycia.db')
+    con = sqlite3.connect('students.db')
     cur = con.cursor()
 
     cur.execute('''SELECT COUNT(name) FROM students''')
@@ -51,7 +51,7 @@ def set_teams(n=5):
 
 
 def set_team_points(points_dict):
-    con = sqlite3.connect('pierwiastki_zycia.db')
+    con = sqlite3.connect('students.db')
     cur = con.cursor()
 
     cur.execute(f'''ALTER TABLE students ADD t_points INT''')
@@ -66,7 +66,7 @@ def set_team_points(points_dict):
 
 
 def edit_record(idx):
-    con = sqlite3.connect('pierwiastki_zycia.db')
+    con = sqlite3.connect('students.db')
     cur = con.cursor()
 
     cur.execute(f'''SELECT * FROM students WHERE id == "{idx-1}"''')

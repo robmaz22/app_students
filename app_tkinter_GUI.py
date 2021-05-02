@@ -10,7 +10,7 @@ def create_new():
     read_button.pack()
 
 root = tk.Tk()
-root.title('Pierwiastk życia')
+root.title('My App')
 root.geometry('440x170')
 
 menu_bar = tk.Menu(root)
@@ -26,8 +26,8 @@ root.config(menu=menu_bar)
 
 welcome_frame = tk.Frame(root, bg='yellow')
 welcome_frame.pack()
-title_label = tk.Label(welcome_frame, text="WITAJ W PROGRAMIE PIERWIASTKI ŻYCIA", bg='green')
-title_label.config(font=("Cantarell 15 bold"))
+title_label = tk.Label(welcome_frame, text="WITAJ W PROGRAMIE DO ANALIZY DANYCH", bg='green')
+title_label.config(font=("Cantarell 13 bold"))
 title_label.pack(pady=15, padx=20)
 create_button = tk.Button(welcome_frame, text='Utwórz nową bazę danych', command=create_new)
 create_button.pack(pady=5)

@@ -25,7 +25,7 @@ def edit_students():
 
 
 def make_analysis():
-    if not os.path.exists('pierwiastki_zycia.db'):
+    if not os.path.exists('students.db'):
         create_from_txt('students.txt')
         print('Podaj liczbę zespołów:')
         groups = int(input('>>> '))
@@ -55,7 +55,7 @@ def make_analysis():
     highest_score_total(n)
 
 
-print('WITAJ W PROGRAMIE PIERWIASTKI ŻYCIA!')
+print('WITAJ W PROGRAMIE DO ANALIZY DANYCH!')
 print('WYBIERZ OPCJĘ:\n1. Rozpocznij analizę\n2. Edytuj bazę danych\n3. Zakończ')
 option = input('>>> ')
 
