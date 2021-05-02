@@ -15,7 +15,7 @@ def edit_students():
         print(f'{id + 1}. {info[0]} {info[1]}')
 
     while True:
-        print('Wybierz indeks, który chcesz edytować:')
+        print('Wybierz indeks, który chcesz edytować (Aby zatrzymać wpisz stop):')
         idx = input('>>> ')
 
         if idx == 'stop':
