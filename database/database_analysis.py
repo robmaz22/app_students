@@ -5,7 +5,7 @@ def base_content():
     con = sqlite3.connect('pierwiastki_zycia.db')
     cur = con.cursor()
 
-    cur.execute('''SELECT name, sname FROM students''')
+    cur.execute('''SELECT name, lname FROM students''')
     students_list = cur.fetchall()
 
     return students_list
@@ -16,7 +16,7 @@ def highest_score_test(n=3):
     cur = con.cursor()
 
     cur.execute('''SELECT 
-    name, sname, school, test
+    name, lname, school, test
     FROM students
     ORDER BY test DESC''')
 
@@ -36,7 +36,7 @@ def highest_score_total(n=3):
     cur = con.cursor()
 
     cur.execute('''SELECT 
-    name, sname, school, test, work, t_points
+    name, lname, school, test, work, t_points
     FROM students
     ORDER BY (test + work + t_points) DESC''')
 
