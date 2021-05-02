@@ -16,7 +16,7 @@ def edit_students():
 
     while True:
         print('Wybierz indeks, który chcesz edytować:')
-        idx = input('>>>')
+        idx = input('>>> ')
 
         if idx == 'stop':
             break
