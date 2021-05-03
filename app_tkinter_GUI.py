@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from database import create_database
 from tkinter import messagebox
-
+from database import database_analysis
 
 class mainWindow:
 
@@ -33,11 +33,11 @@ class mainWindow:
         self.welcome_frame = tk.Frame(self.master, bg='white')
         self.welcome_frame.pack(fill='both', expand=1)
         self.title_label = tk.Label(self.welcome_frame, text="WITAJ W PROGRAMIE DO ANALIZY DANYCH", bg='white')
-        self.title_label.config(font=("Cantarell 13 bold"))
+        self.title_label.config(font="Cantarell 13 bold")
         self.title_label.pack(pady=15, padx=20)
         self.create_button = tk.Button(self.welcome_frame, text='Utwórz nową bazę danych', command=self.create_new)
         self.create_button.pack(pady=5)
-        self.open_button = tk.Button(self.welcome_frame, text='Otwórz istniejącą bazę danych')
+        self.open_button = tk.Button(self.welcome_frame, text='Otwórz istniejącą bazę danych', command=lambda: self.start_analysis(True))
         self.open_button.pack(pady=5)
 
     # wybór tworzenia nowej bazy
@@ -50,21 +50,45 @@ class mainWindow:
         self.read_button = tk.Button(self.create_frame, text='Stwórz ręcznie', command=self.create_manual)
         self.read_button.pack()
 
+    # wyświetlenie wyników analizy
+    def print_result(self):
+        self.analysis_frame.pack_forget()
+
+        self.results_frame = tk.Frame(self.master, bg='white')
+        self.results_frame.pack(fill='both', expand=1)
+
+        text_box = tk.Text(self.results_frame, height = 15, width = 52)
+
+        self.result = f'{"="*52}\n\t\t  UZYSKANE WYNIKI\n{"="*52}\n'
+        self.result += '* NAJLEPSZY TEST:\n'
+        self.result += database_analysis.highest_score_test(3)
+        self.result += '* NAJLEPSZY WYNIK OGÓLNY'
+        self.result += database_analysis.highest_score_total(3)
+
+        text_box.insert(tk.END, self.result)
+        text_box.config(state='disabled')
+        text_box.pack()
+
+
     # wybór po załadowaniu bazy
-    def start_analysis(self):
-        self.create_frame.pack_forget()
+    def start_analysis(self, n):
+        if n is True:
+            self.welcome_frame.pack_forget()
+        else:
+            self.create_frame.pack_forget()
+
         self.analysis_frame = tk.Frame(self.master, bg='white')
         self.analysis_frame.pack(fill='both', expand=1)
 
-        self.start_button = tk.Button(self.analysis_frame, text='Rozpocznij analizę').pack()
-        self.start_button = tk.Button(self.analysis_frame, text='Edytuj bazę').pack()
+        self.start_button = tk.Button(self.analysis_frame, text='Rozpocznij analizę', command=self.print_result).pack(pady=30)
+        self.insert_button = tk.Button(self.analysis_frame, text='Edytuj bazę').pack(pady=10)
 
     # Otwieranie bazy danych z pliku txt z podanej lokalizacji
     def open_file(self):
         self.filename = filedialog.askopenfilename(filetypes=[("Plik tekstowy", "*.txt")])
         create_database.create_from_txt(self.filename)
         messagebox.showinfo(title='Komunikat', message='Utworzono bazę danych!')
-        self.start_analysis()
+        self.start_analysis(2)
 
     # tworzenie bazy danych ręcznie
     def create_manual(self):
