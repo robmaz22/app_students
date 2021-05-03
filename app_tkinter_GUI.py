@@ -1,13 +1,37 @@
 import tkinter as tk
 
+
+def create_manual():
+    edit_window = tk.Tk()
+    edit_window.title('Stwórz bazę')
+
+    title_label = tk.Label(edit_window, text='Podaj dane ucznia').grid(column=0, row=0, columnspan=2)
+    name_label = tk.Label(edit_window, text='Imię').grid(column=0, row=1)
+    lname_label = tk.Label(edit_window, text='Nazwisko').grid(column=0, row=2)
+    class_label = tk.Label(edit_window, text='Klasa').grid(column=0, row=3)
+    school_label = tk.Label(edit_window, text='Szkoła').grid(column=0, row=4)
+    test_label = tk.Label(edit_window, text='Punkty za test').grid(column=0, row=5)
+    work_label = tk.Label(edit_window, text='Punkty za pracę').grid(column=0, row=6)
+
+    name_entry = tk.Entry(edit_window).grid(column=1, row=1)
+    lname_entry = tk.Entry(edit_window).grid(column=1, row=2)
+    class_entry = tk.Entry(edit_window).grid(column=1, row=3)
+    school_entry = tk.Entry(edit_window).grid(column=1, row=4)
+    test_entry = tk.Entry(edit_window).grid(column=1, row=5)
+    work_entry = tk.Entry(edit_window).grid(column=1, row=6)
+
+    save_button = tk.Button(edit_window, text='Zapisz').grid(column=0, row=7, padx=10, pady=10)
+    delete_button = tk.Button(edit_window, text='Wyczyść dane').grid(column=1, row=7, padx=10, pady=10)
+
 def create_new():
     welcome_frame.pack_forget()
-    create_frame = tk.Frame(root, bg='yellow')
+    create_frame = tk.Frame(root, bg='white')
     create_frame.pack(fill='both', expand=1)
     new_button = tk.Button(create_frame, text='Wczytaj z pliku...')
     new_button.pack(pady=30)
-    read_button =tk.Button(create_frame, text='Stwórz ręcznie')
+    read_button = tk.Button(create_frame, text='Stwórz ręcznie', command=create_manual)
     read_button.pack()
+
 
 root = tk.Tk()
 root.title('My App')
@@ -24,15 +48,14 @@ menu_bar.add_cascade(label="Pomoc", menu=helpmenu)
 
 root.config(menu=menu_bar)
 
-welcome_frame = tk.Frame(root, bg='yellow')
-welcome_frame.pack()
-title_label = tk.Label(welcome_frame, text="WITAJ W PROGRAMIE DO ANALIZY DANYCH", bg='green')
+welcome_frame = tk.Frame(root, bg='white')
+welcome_frame.pack(fill='both', expand=1)
+title_label = tk.Label(welcome_frame, text="WITAJ W PROGRAMIE DO ANALIZY DANYCH", bg='white')
 title_label.config(font=("Cantarell 13 bold"))
 title_label.pack(pady=15, padx=20)
 create_button = tk.Button(welcome_frame, text='Utwórz nową bazę danych', command=create_new)
 create_button.pack(pady=5)
 open_button = tk.Button(welcome_frame, text='Otwórz istniejącą bazę danych')
 open_button.pack(pady=5)
-
 
 root.mainloop()
