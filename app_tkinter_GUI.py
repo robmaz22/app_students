@@ -1,6 +1,17 @@
 import tkinter as tk
+from tkinter import filedialog
+from database import create_database
+from tkinter import messagebox
 
 
+# Otwieranie bazy danych z pliku txt z podanej lokalizacji
+def open_file():
+    filename = filedialog.askopenfilename(filetypes=[("Plik tekstowy", "*.txt")])
+    create_database.create_from_txt(filename)
+    messagebox.showinfo(title='Komunikat', message='Utworzono bazę danych!')
+
+
+# tworzenie bazy danych ręcznie
 def create_manual():
     edit_window = tk.Tk()
     edit_window.title('Stwórz bazę')
@@ -23,16 +34,19 @@ def create_manual():
     save_button = tk.Button(edit_window, text='Zapisz').grid(column=0, row=7, padx=10, pady=10)
     delete_button = tk.Button(edit_window, text='Wyczyść dane').grid(column=1, row=7, padx=10, pady=10)
 
+
+# Przejście na wybór nowej bazy danych
 def create_new():
     welcome_frame.pack_forget()
     create_frame = tk.Frame(root, bg='white')
     create_frame.pack(fill='both', expand=1)
-    new_button = tk.Button(create_frame, text='Wczytaj z pliku...')
+    new_button = tk.Button(create_frame, text='Wczytaj z pliku...', command=open_file)
     new_button.pack(pady=30)
     read_button = tk.Button(create_frame, text='Stwórz ręcznie', command=create_manual)
     read_button.pack()
 
 
+# tworzenie głównego okna i menu
 root = tk.Tk()
 root.title('My App')
 root.geometry('440x170')
