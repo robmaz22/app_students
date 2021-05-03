@@ -22,14 +22,18 @@ def highest_score_test(n=3):
 
     results = cur.fetchall()
 
+    text = """"""
+
     for idx in range(n):
-        print(idx + 1, 'MIEJSCE:')
-        print(f'\t{results[idx][0]} {results[idx][1]} ({results[idx][2]})\n\t{results[idx][3]} punktów')
-        print('-' * 15)
+        text += str(idx + 1) + ' MIEJSCE:\n'
+        text += f'\t{str(results[idx][0])} {str(results[idx][1])} ({str(results[idx][2])})\n\t{str(results[idx][3])} punktów\n'
+        text += '-' * 15
+        text += '\n'
 
     con.commit()
     con.close()
 
+    return text
 
 def highest_score_total(n=3):
     con = sqlite3.connect('students.db')
@@ -42,12 +46,17 @@ def highest_score_total(n=3):
 
     results = cur.fetchall()
 
+    text = """"""
+
     for idx in range(n):
-        print(idx + 1, 'MIEJSCE:')
+        text += str(idx + 1) + ' MIEJSCE:\n'
         total = int(results[idx][3]) + int(results[idx][4]) + int(results[idx][5])
 
-        print(f'\t{results[idx][0]} {results[idx][1]} ({results[idx][2]})\n\t{total} punktów')
-        print('-' * 15)
+        text += f'\t{str(results[idx][0])} {str(results[idx][1])} ({str(results[idx][2])})\n\t{str(total)} punktów\n'
+        text += '-' * 15
+        text += '\n'
 
     con.commit()
     con.close()
+
+    return text
