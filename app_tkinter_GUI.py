@@ -5,6 +5,8 @@ from tkinter import messagebox
 
 
 class mainWindow:
+
+    # Inicjalizacja
     def __init__(self, master):
         self.master = master
         self.master.title('My App')
@@ -13,6 +15,7 @@ class mainWindow:
         self.create_menu()
         self.welcome_screen()
 
+    # Tworzenie menu
     def create_menu(self):
         self.menu_bar = tk.Menu(self.master)
         self.option_menu = tk.Menu(self.menu_bar, tearoff=0)
@@ -25,6 +28,7 @@ class mainWindow:
 
         self.master.config(menu=self.menu_bar)
 
+    # Tworzenie ramki z głównym powitaniem
     def welcome_screen(self):
         self.welcome_frame = tk.Frame(self.master, bg='white')
         self.welcome_frame.pack(fill='both', expand=1)
@@ -46,8 +50,14 @@ class mainWindow:
         self.read_button = tk.Button(self.create_frame, text='Stwórz ręcznie', command=self.create_manual)
         self.read_button.pack()
 
+    # wybór po załadowaniu bazy
     def start_analysis(self):
         self.create_frame.pack_forget()
+        self.analysis_frame = tk.Frame(self.master, bg='white')
+        self.analysis_frame.pack(fill='both', expand=1)
+
+        self.start_button = tk.Button(self.analysis_frame, text='Rozpocznij analizę').pack()
+        self.start_button = tk.Button(self.analysis_frame, text='Edytuj bazę').pack()
 
     # Otwieranie bazy danych z pliku txt z podanej lokalizacji
     def open_file(self):
@@ -80,9 +90,9 @@ class mainWindow:
         self.delete_button = tk.Button(self.edit_window, text='Wyczyść dane').grid(column=1, row=7, padx=10, pady=10)
 
 
+# Uruchomienie programu
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = mainWindow(root)
 
-# tworzenie głównego okna i menu
-root = tk.Tk()
-app = mainWindow(root)
-
-root.mainloop()
+    root.mainloop()
