@@ -3,6 +3,7 @@ from tkinter import filedialog
 from database import create_database
 from tkinter import messagebox
 from database import database_analysis
+from GUI import edit_students
 
 
 class mainWindow:
@@ -50,7 +51,7 @@ class mainWindow:
         self.create_frame.pack(fill='both', expand=1)
         self.new_button = tk.Button(self.create_frame, text='Wczytaj z pliku...', command=self.open_file)
         self.new_button.pack(pady=30)
-        self.read_button = tk.Button(self.create_frame, text='Stwórz ręcznie', command=self.create_manual)
+        self.read_button = tk.Button(self.create_frame, text='Stwórz ręcznie', command=lambda: edit_students.editStudents(self.master))
         self.read_button.pack()
 
     # wyświetlenie wyników analizy
@@ -68,7 +69,7 @@ class mainWindow:
         self.result += '* NAJLEPSZY TEST:\n'
         self.result += database_analysis.highest_score_test(3)
         self.result += f'\n{"+"*52}\n'
-        self.result += '\n* NAJLEPSZY WYNIK OGÓLNY\n'
+        self.result += '\n* NAJLEPSZY WYNIK OGÓLNY:\n'
         self.result += database_analysis.highest_score_total(3)
 
         text_box.insert(tk.END, self.result)
@@ -95,33 +96,13 @@ class mainWindow:
 
     # Otwieranie bazy danych z pliku txt z podanej lokalizacji
     def open_file(self):
-        self.filename = filedialog.askopenfilename(filetypes=[("Plik tekstowy", "*.txt")])
-        create_database.create_from_txt(self.filename)
-        messagebox.showinfo(title='Komunikat', message='Utworzono bazę danych!')
-        self.start_analysis(2)
-
-    # tworzenie bazy danych ręcznie
-    def create_manual(self):
-        self.edit_window = tk.Tk()
-        self.edit_window.title('Stwórz bazę')
-
-        self.title_label = tk.Label(self.edit_window, text='Podaj dane ucznia').grid(column=0, row=0, columnspan=2)
-        self.name_label = tk.Label(self.edit_window, text='Imię').grid(column=0, row=1)
-        self.lname_label = tk.Label(self.edit_window, text='Nazwisko').grid(column=0, row=2)
-        self.class_label = tk.Label(self.edit_window, text='Klasa').grid(column=0, row=3)
-        self.school_label = tk.Label(self.edit_window, text='Szkoła').grid(column=0, row=4)
-        self.test_label = tk.Label(self.edit_window, text='Punkty za test').grid(column=0, row=5)
-        self.work_label = tk.Label(self.edit_window, text='Punkty za pracę').grid(column=0, row=6)
-
-        self.name_entry = tk.Entry(self.edit_window).grid(column=1, row=1)
-        self.lname_entry = tk.Entry(self.edit_window).grid(column=1, row=2)
-        self.class_entry = tk.Entry(self.edit_window).grid(column=1, row=3)
-        self.school_entry = tk.Entry(self.edit_window).grid(column=1, row=4)
-        self.test_entry = tk.Entry(self.edit_window).grid(column=1, row=5)
-        self.work_entry = tk.Entry(self.edit_window).grid(column=1, row=6)
-
-        self.save_button = tk.Button(self.edit_window, text='Zapisz').grid(column=0, row=7, padx=10, pady=10)
-        self.delete_button = tk.Button(self.edit_window, text='Wyczyść dane').grid(column=1, row=7, padx=10, pady=10)
+        try:
+            self.filename = filedialog.askopenfilename(filetypes=[("Plik tekstowy", "*.txt")])
+            create_database.create_from_txt(self.filename)
+            messagebox.showinfo(title='Komunikat', message='Utworzono bazę danych!')
+            self.start_analysis(2)
+        except:
+            return
 
 
 class teamsWindow(tk.Toplevel):
@@ -133,9 +114,9 @@ class teamsWindow(tk.Toplevel):
 
         # self.frame = tk.Frame(self, bg='white').pack(fill='both', expand=1)
 
-        self.entrys = [tk.Entry(self, width=5) for i in range(5)]
+        self.entries = [tk.Entry(self, width=5) for i in range(5)]
 
-        for n , entry in enumerate(self.entrys):
+        for n , entry in enumerate(self.entries):
             tk.Label(self, text=f'Zespół {n+1}').grid(padx=10, column=0, row=n)
             entry.grid(padx=5, column=1, row=n)
 
@@ -145,19 +126,12 @@ class teamsWindow(tk.Toplevel):
 
         points_dict = {}
 
-        for key, entry in enumerate(self.entrys):
+        for key, entry in enumerate(self.entries):
             points_dict[key] = int(entry.get())
 
         create_database.set_teams(5)
         create_database.set_team_points(points_dict)
         self.destroy()
-
-
-
-
-
-
-
 
 
 # Uruchomienie programu
