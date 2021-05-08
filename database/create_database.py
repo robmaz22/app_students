@@ -3,6 +3,7 @@ import random
 
 database_path = 'students.db'
 
+
 def create_from_txt(path_to_txt):
     global database_path
     con = sqlite3.connect(database_path)
@@ -21,20 +22,36 @@ def create_from_txt(path_to_txt):
     con.commit()
     con.close()
 
-def save_database(path, member_list):
+
+def save_database(path, member_list, flag=False):
+
     global database_path
-    database_path = path
-    con = sqlite3.connect(database_path)
-    cur = con.cursor()
 
-    cur.execute('''CREATE TABLE students
-                       (id, name, lname, class, school, test, work)''')
+    if flag is False:
+        global database_path
+        database_path = path
+        con = sqlite3.connect(database_path)
+        cur = con.cursor()
 
-    for member in member_list:
-        cur.execute(f"INSERT INTO students VALUES {tuple(member.values())}")
+        cur.execute('''CREATE TABLE students
+                           (id, name, lname, class, school, test, work)''')
+
+        for member in member_list:
+            cur.execute(f"INSERT INTO students VALUES {tuple(member.values())}")
+    else:
+        con = sqlite3.connect(database_path)
+        cur = con.cursor()
+
+        cur.execute(f'''DELETE FROM students''')
+
+        for member in member_list:
+            member['team'] = 0
+            member['point'] = 0
+            cur.execute(f"INSERT INTO students VALUES {tuple(member.values())}")
 
     con.commit()
     con.close()
+
 
 def set_teams(n=5):
     con = sqlite3.connect(database_path)
@@ -81,11 +98,34 @@ def set_team_points(points_dict):
     con.close()
 
 
+def return_database(path):
+    global database_path
+    database_path = path
+    con = sqlite3.connect(database_path)
+    cur = con.cursor()
+
+    cur.execute("""SELECT * FROM students""")
+
+    data = cur.fetchall()
+
+    result = []
+
+    names = ['id', 'name', 'lname', 'class', 'school', 'test', 'work']
+
+    for record in data:
+        student_info = {}
+        for key, val in zip(names, record):
+            student_info[key] = val
+        result.append(student_info)
+
+    return result
+
+
 def edit_record(idx):
     con = sqlite3.connect(database_path)
     cur = con.cursor()
 
-    cur.execute(f'''SELECT * FROM students WHERE id == "{idx-1}"''')
+    cur.execute(f'''SELECT * FROM students WHERE id == "{idx - 1}"''')
     info = cur.fetchone()
 
     print('WYBRANY REKORD:')
@@ -111,7 +151,7 @@ test = "{record[4]}",
 work = "{record[5]}",
 team = "{record[6]}",
 t_points = "{record[7]}"
-WHERE id = "{idx-1}"''')
+WHERE id = "{idx - 1}"''')
 
     cur.execute(f'''SELECT * FROM students WHERE id == "{idx - 1}"''')
     info = cur.fetchone()

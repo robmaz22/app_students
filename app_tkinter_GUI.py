@@ -51,11 +51,16 @@ class mainWindow:
         self.create_frame.pack(fill='both', expand=1)
         self.new_button = tk.Button(self.create_frame, text='Wczytaj z pliku...', command=self.open_file)
         self.new_button.pack(pady=30)
-        self.read_button = tk.Button(self.create_frame, text='Stwórz ręcznie', command=lambda: edit_students.editStudents(self.master))
+        self.read_button = tk.Button(self.create_frame, text='Stwórz ręcznie',
+                                     command=lambda: edit_students.editStudents(self.master))
         self.read_button.pack()
 
     # wyświetlenie wyników analizy
     def print_result(self):
+
+        mbox = messagebox.askquestion('Wybór zespółów', 'Czy chcesz wylosować zespoły?\n(Użyj tej opcji jeśli utworzyłeś nową bazę lub zmodyfikowałeś istniejącą)')
+        if mbox == 'yes':
+            teamsWindow()
 
         self.master.geometry('600x500+200+200')
         self.analysis_frame.pack_forget()
@@ -68,7 +73,7 @@ class mainWindow:
         self.result = f'{"=" * 52}\n\t\t  UZYSKANE WYNIKI\n{"=" * 52}\n'
         self.result += '* NAJLEPSZY TEST:\n'
         self.result += database_analysis.highest_score_test(3)
-        self.result += f'\n{"+"*52}\n'
+        self.result += f'\n{"+" * 52}\n'
         self.result += '\n* NAJLEPSZY WYNIK OGÓLNY:\n'
         self.result += database_analysis.highest_score_total(3)
 
@@ -77,11 +82,12 @@ class mainWindow:
         text_box.pack()
 
     def open_exst_base(self):
-        try:
-            database_path = filedialog.askopenfilename(filetypes=[("Database file", "*.db")])
-            database_analysis.set_db_name(database_path)
+        self.ex_database_path = filedialog.askopenfilename(filetypes=[("Database file", "*.db")])
+
+        if self.ex_database_path is not None:
+            database_analysis.set_db_name(self.ex_database_path)
             self.start_analysis(True)
-        except:
+        else:
             return
 
     # wybór po załadowaniu bazy
@@ -90,25 +96,27 @@ class mainWindow:
             self.welcome_frame.pack_forget()
         else:
             self.create_frame.pack_forget()
-            mbox = messagebox.askquestion('Wybór zespółów', 'Czy chcesz wylosować zespoły?')
-            if mbox == 'yes':
-                teams = teamsWindow()
+
 
         self.analysis_frame = tk.Frame(self.master, bg='white')
         self.analysis_frame.pack(fill='both', expand=1)
 
         self.start_button = tk.Button(self.analysis_frame, text='Rozpocznij analizę', command=self.print_result).pack(
             pady=30)
-        self.insert_button = tk.Button(self.analysis_frame, text='Edytuj bazę').pack(pady=10)
+        self.insert_button = tk.Button(self.analysis_frame, text='Edytuj bazę', command=self.edit_base).pack(pady=10)
+
+    def edit_base(self):
+        records = create_database.return_database(self.ex_database_path)
+        edit_students.editStudents(self.master, records)
 
     # Otwieranie bazy danych z pliku txt z podanej lokalizacji
     def open_file(self):
-        try:
-            self.filename = filedialog.askopenfilename(filetypes=[("Plik tekstowy", "*.txt")])
+        self.filename = filedialog.askopenfilename(filetypes=[("Plik tekstowy", "*.txt")])
+        if self.filename is not None:
             create_database.create_from_txt(self.filename)
             messagebox.showinfo(title='Komunikat', message='Utworzono bazę danych!')
             self.start_analysis(False)
-        except:
+        else:
             return
 
 
@@ -121,20 +129,21 @@ class teamsWindow(tk.Toplevel):
 
         # self.frame = tk.Frame(self, bg='white').pack(fill='both', expand=1)
 
-        self.entries = [tk.Entry(self, width=5) for i in range(5)]
+        self.entries = [tk.Entry(self, width=5) for _ in range(5)]
 
-        for n , entry in enumerate(self.entries):
-            tk.Label(self, text=f'Zespół {n+1}').grid(padx=10, column=0, row=n)
+        for n, entry in enumerate(self.entries):
+            tk.Label(self, text=f'Zespół {n + 1}').grid(padx=10, column=0, row=n)
             entry.grid(padx=5, column=1, row=n)
 
-        accept_button = tk.Button(self, text='Zatwierdź', command=self.set_teams).grid(column=0, row=5, columnspan=2)
+        accept_button = tk.Button(self, text='Zatwierdź', command=self.set_teams)
+        accept_button.grid(column=0, row=5, columnspan=2)
 
     def set_teams(self):
 
         points_dict = {}
 
         for key, entry in enumerate(self.entries):
-            points_dict[key+1] = int(entry.get())
+            points_dict[key + 1] = int(entry.get())
 
         create_database.set_teams(5)
         create_database.set_team_points(points_dict)

@@ -1,12 +1,14 @@
 from tkinter import *
 from tkinter import messagebox
-from tkinter import  filedialog
+from tkinter import filedialog
 from database import create_database
 
 
 class editStudents(Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, data=None):
         Toplevel.__init__(self, parent)
+        if data is None:
+            data = []
         self.title('Stwórz bazę')
         self.geometry('705x250')
         self.resizable(False, False)
@@ -15,7 +17,12 @@ class editStudents(Toplevel):
         self.list_frame = Frame(self)
         self.list_frame.grid(column=1, row=0)
 
-        self.members = []
+        if data is not None:
+            self.members = data
+            self.flag = True
+        else:
+            self.members = []
+            self.flag = False
 
         self.scrollbar = Scrollbar(self.list_frame, orient=VERTICAL)
         self.scrollbar.grid(column=5, row=0, sticky=N + S + W, rowspan=7, pady=8)
@@ -29,21 +36,39 @@ class editStudents(Toplevel):
         self.info.grid(column=6, row=0, sticky=N, columnspan=2, pady=8)
 
         self.update_btn = Button(self.list_frame, text='Modyfikuj', command=self.update)
-        self.update_btn.grid(column=6, row=1, sticky=N, pady=(4,2), columnspan=2)
+        self.update_btn.grid(column=6, row=1, sticky=N, pady=(4, 2), columnspan=2)
         self.delete_btn = Button(self.list_frame, text='Usuń', command=self.del_record)
-        self.delete_btn.grid(column=6, row=2, sticky=N, pady=(4,2), columnspan=2)
+        self.delete_btn.grid(column=6, row=2, sticky=N, pady=(4, 2), columnspan=2)
         self.save_btn = Button(self.list_frame, text='Zapisz bazę', command=self.save_data)
-        self.save_btn.grid(column=6, row=3, sticky=N, pady=(4,2), columnspan=2)
-        self.update_btn.config(state=DISABLED)
-        self.delete_btn.config(state=DISABLED)
-        self.save_btn.config(state=DISABLED)
+        self.save_btn.grid(column=6, row=3, sticky=N, pady=(4, 2), columnspan=2)
 
-        self.entries = [Entry(self.add_frame, width=15) for i in range(6)]
+        if len(self.members) > 0:
+            members = []
+
+            for id, student in enumerate(self.members):
+                members.append(str(id + 1) + '.' + student['name'] + ' ' + student['lname'])
+
+            self.listbox.delete(0, END)
+
+            for n, mem in enumerate(members):
+                self.listbox.insert(int(n), mem)
+
+            self.id_value = len(self.members) + 1
+
+            self.update_btn.config(state=DISABLED)
+            self.delete_btn.config(state=DISABLED)
+
+        else:
+            self.update_btn.config(state=DISABLED)
+            self.delete_btn.config(state=DISABLED)
+            self.save_btn.config(state=DISABLED)
+            self.id_value = 1
+
+        self.entries = [Entry(self.add_frame, width=15) for _ in range(6)]
         names = ['Imię', 'Nazwisko', 'Klasa', 'Szkoła', 'Punkty za test', 'Punkty za pracę']
 
-        self.id_value = 1
-
-        id_label = Label(self.add_frame, text='ID').grid(column=0, row=0)
+        id_label = Label(self.add_frame, text='ID')
+        id_label.grid(column=0, row=0)
 
         self.id_entry = Entry(self.add_frame, width=3, justify='center')
         self.id_entry.insert(0, self.id_value)
@@ -55,9 +80,9 @@ class editStudents(Toplevel):
             entry.grid(padx=5, column=1, row=n + 1)
 
         self.add_button = Button(self.add_frame, text='Dodaj', command=self.add_student)
-        self.add_button.grid(column=0, row=7, columnspan=2,pady=(20,10), padx=40, sticky=W)
+        self.add_button.grid(column=0, row=7, columnspan=2, pady=(20, 10), padx=40, sticky=W)
         self.clear_button = Button(self.add_frame, text='Wyczyść', command=self.clear_all)
-        self.clear_button.grid(column=1, row=7,columnspan=2, pady=(20,10),padx=40, sticky=E)
+        self.clear_button.grid(column=1, row=7, columnspan=2, pady=(20, 10), padx=40, sticky=E)
 
     def add_student(self, update=False, upd_idx=0):
 
@@ -97,8 +122,6 @@ class editStudents(Toplevel):
         self.add_button.config(text='Dodaj', command=self.add_student)
 
         if len(self.members) > 0:
-            self.update_btn.config(state=NORMAL)
-            self.delete_btn.config(state=NORMAL)
             self.save_btn.config(state=NORMAL)
 
     def clear_all(self):
@@ -122,6 +145,9 @@ Punkty za pracę: {self.members[id - 1]['work']}"""
 
         self.info.insert(1.0, string)
 
+        self.update_btn.config(state=NORMAL)
+        self.delete_btn.config(state=NORMAL)
+
     def update(self):
         cur = self.listbox.curselection()
 
@@ -129,22 +155,21 @@ Punkty za pracę: {self.members[id - 1]['work']}"""
 
         self.id_entry.config(state='normal')
         self.id_entry.delete(0, END)
-        self.id_entry.insert(0, self.members[id-1]['id'])
+        self.id_entry.insert(0, self.members[id - 1]['id'])
         self.id_entry.config(state='readonly')
 
         data = []
 
-        for val in self.members[id-1].values():
+        for val in self.members[id - 1].values():
             data.append(val)
 
         for entry, val in zip(self.entries, data[1:]):
-            entry.delete(0,END)
+            entry.delete(0, END)
             entry.insert(0, val)
 
-        self.add_button.config(text='Zamień', command=lambda: self.add_student(update=True, upd_idx = id-1))
+        self.add_button.config(text='Zamień', command=lambda: self.add_student(update=True, upd_idx=id - 1))
 
     def del_record(self):
-
 
         cur = self.listbox.curselection()
 
@@ -156,7 +181,6 @@ Punkty za pracę: {self.members[id - 1]['work']}"""
             self.update_btn.config(state=DISABLED)
             self.delete_btn.config(state=DISABLED)
             self.save_btn.config(state=DISABLED)
-
 
         self.listbox.delete(0, END)
 
@@ -174,11 +198,15 @@ Punkty za pracę: {self.members[id - 1]['work']}"""
         self.id_entry.insert(0, self.id_value)
         self.id_entry.config(state='readonly')
 
-
     def save_data(self):
-        path = filedialog.asksaveasfilename(title='Zapisz bazę', defaultextension='.db', filetypes=[("Database file", '*.db')])
-        create_database.save_database(path, self.members)
-        messagebox.showinfo('Sukces', 'Pomyślnie zapisano bazę danych')
+        if self.flag is False:
+            path = filedialog.asksaveasfilename(title='Zapisz bazę', defaultextension='.db',
+                                                filetypes=[("Database file", '*.db')])
+            create_database.save_database(path, self.members)
+            messagebox.showinfo('Sukces', 'Pomyślnie zapisano bazę danych')
+        else:
+            create_database.save_database(path=None, flag=True, member_list=self.members)
+            messagebox.showinfo('Sukces', 'Pomyślnie nadpisano bazę danych')
         self.destroy()
 
 
