@@ -9,6 +9,7 @@ class editStudents(Toplevel):
         Toplevel.__init__(self, parent)
         self.title('Stwórz bazę')
         self.geometry('705x250')
+        self.resizable(False, False)
         self.add_frame = LabelFrame(self, text='Dodaj ucznia', width=190, height=190)
         self.add_frame.grid(column=0, row=0, sticky=N)
         self.list_frame = Frame(self)
@@ -33,6 +34,9 @@ class editStudents(Toplevel):
         self.delete_btn.grid(column=6, row=2, sticky=N, pady=(4,2), columnspan=2)
         self.save_btn = Button(self.list_frame, text='Zapisz bazę', command=self.save_data)
         self.save_btn.grid(column=6, row=3, sticky=N, pady=(4,2), columnspan=2)
+        self.update_btn.config(state=DISABLED)
+        self.delete_btn.config(state=DISABLED)
+        self.save_btn.config(state=DISABLED)
 
         self.entries = [Entry(self.add_frame, width=15) for i in range(6)]
         names = ['Imię', 'Nazwisko', 'Klasa', 'Szkoła', 'Punkty za test', 'Punkty za pracę']
@@ -92,6 +96,11 @@ class editStudents(Toplevel):
 
         self.add_button.config(text='Dodaj', command=self.add_student)
 
+        if len(self.members) > 0:
+            self.update_btn.config(state=NORMAL)
+            self.delete_btn.config(state=NORMAL)
+            self.save_btn.config(state=NORMAL)
+
     def clear_all(self):
         for entry in self.entries:
             entry.delete(0, END)
@@ -136,30 +145,35 @@ Punkty za pracę: {self.members[id - 1]['work']}"""
 
     def del_record(self):
 
-        try:
-            cur = self.listbox.curselection()
 
-            id = int(self.listbox.get(cur)[0])
+        cur = self.listbox.curselection()
 
-            del self.members[id - 1]
+        id = int(self.listbox.get(cur)[0])
 
-            self.listbox.delete(0, END)
+        del self.members[id - 1]
 
-            members = []
+        if len(self.members) < 1:
+            self.update_btn.config(state=DISABLED)
+            self.delete_btn.config(state=DISABLED)
+            self.save_btn.config(state=DISABLED)
 
-            for id, student in enumerate(self.members):
-                members.append(str(id + 1) + '.' + student['name'] + ' ' + student['lname'])
 
-            for n, mem in enumerate(members):
-                self.listbox.insert(int(n), mem)
+        self.listbox.delete(0, END)
 
-            self.id_value -= 1
-            self.id_entry.config(state='normal')
-            self.id_entry.delete(0, END)
-            self.id_entry.insert(0, self.id_value)
-            self.id_entry.config(state='readonly')
-        except:
-            messagebox.showerror('Błąd', 'Baza jest pusta!\nNie można usunąć!')
+        members = []
+
+        for id, student in enumerate(self.members):
+            members.append(str(id + 1) + '.' + student['name'] + ' ' + student['lname'])
+
+        for n, mem in enumerate(members):
+            self.listbox.insert(int(n), mem)
+
+        self.id_value -= 1
+        self.id_entry.config(state='normal')
+        self.id_entry.delete(0, END)
+        self.id_entry.insert(0, self.id_value)
+        self.id_entry.config(state='readonly')
+
 
     def save_data(self):
         path = filedialog.asksaveasfilename(title='Zapisz bazę', defaultextension='.db', filetypes=[("Database file", '*.db')])
