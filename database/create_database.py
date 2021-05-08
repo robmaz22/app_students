@@ -19,6 +19,18 @@ def create_from_txt(path_to_txt):
     con.commit()
     con.close()
 
+def save_database(path, member_list):
+    con = sqlite3.connect(path)
+    cur = con.cursor()
+
+    cur.execute('''CREATE TABLE students
+                       (id, name, lname, class, school, test, work)''')
+
+    for member in member_list:
+        cur.execute(f"INSERT INTO students VALUES {tuple(member.values())}")
+
+    con.commit()
+    con.close()
 
 def set_teams(n=5):
     con = sqlite3.connect('students.db')
