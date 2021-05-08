@@ -1,4 +1,7 @@
 from tkinter import *
+from tkinter import messagebox
+from tkinter import  filedialog
+from database import create_database
 
 
 class editStudents(Toplevel):
@@ -84,7 +87,6 @@ class editStudents(Toplevel):
 
         self.id_entry.config(state='normal')
         self.id_entry.delete(0, END)
-
         self.id_entry.insert(0, self.id_value)
         self.id_entry.config(state='readonly')
 
@@ -133,10 +135,38 @@ Punkty za pracę: {self.members[id - 1]['work']}"""
         self.add_button.config(text='Zamień', command=lambda: self.add_student(update=True, upd_idx = id-1))
 
     def del_record(self):
-        pass
+
+        try:
+            cur = self.listbox.curselection()
+
+            id = int(self.listbox.get(cur)[0])
+
+            del self.members[id - 1]
+
+            self.listbox.delete(0, END)
+
+            members = []
+
+            for id, student in enumerate(self.members):
+                members.append(str(id + 1) + '.' + student['name'] + ' ' + student['lname'])
+
+            for n, mem in enumerate(members):
+                self.listbox.insert(int(n), mem)
+
+            self.id_value -= 1
+            self.id_entry.config(state='normal')
+            self.id_entry.delete(0, END)
+            self.id_entry.insert(0, self.id_value)
+            self.id_entry.config(state='readonly')
+        except:
+            messagebox.showerror('Błąd', 'Baza jest pusta!\nNie można usunąć!')
 
     def save_data(self):
-        pass
+        path = filedialog.asksaveasfilename(title='Zapisz bazę', defaultextension='.db', filetypes=[("Database file", '*.db')])
+        create_database.save_database(path, self.members)
+        messagebox.showinfo('Sukces', 'Pomyślnie zapisano bazę danych')
+        self.destroy()
+
 
 def main():
     root = Tk()
