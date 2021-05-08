@@ -41,7 +41,7 @@ class mainWindow:
         self.create_button = tk.Button(self.welcome_frame, text='Utwórz nową bazę danych', command=self.create_new)
         self.create_button.pack(pady=5)
         self.open_button = tk.Button(self.welcome_frame, text='Otwórz istniejącą bazę danych',
-                                     command=lambda: self.start_analysis(True))
+                                     command=self.open_exst_base)
         self.open_button.pack(pady=5)
 
     # wybór tworzenia nowej bazy
@@ -76,16 +76,23 @@ class mainWindow:
         text_box.config(state='disabled')
         text_box.pack()
 
+    def open_exst_base(self):
+        try:
+            database_path = filedialog.askopenfilename(filetypes=[("Database file", "*.db")])
+            database_analysis.set_db_name(database_path)
+            self.start_analysis(True)
+        except:
+            return
+
     # wybór po załadowaniu bazy
     def start_analysis(self, n):
         if n is True:
             self.welcome_frame.pack_forget()
         else:
             self.create_frame.pack_forget()
-
-        mbox = messagebox.askquestion('Wybór zespółów', 'Czy chcesz wylosować zespoły?')
-        if mbox == 'yes':
-            teams = teamsWindow()
+            mbox = messagebox.askquestion('Wybór zespółów', 'Czy chcesz wylosować zespoły?')
+            if mbox == 'yes':
+                teams = teamsWindow()
 
         self.analysis_frame = tk.Frame(self.master, bg='white')
         self.analysis_frame.pack(fill='both', expand=1)
@@ -100,7 +107,7 @@ class mainWindow:
             self.filename = filedialog.askopenfilename(filetypes=[("Plik tekstowy", "*.txt")])
             create_database.create_from_txt(self.filename)
             messagebox.showinfo(title='Komunikat', message='Utworzono bazę danych!')
-            self.start_analysis(2)
+            self.start_analysis(False)
         except:
             return
 
@@ -127,7 +134,7 @@ class teamsWindow(tk.Toplevel):
         points_dict = {}
 
         for key, entry in enumerate(self.entries):
-            points_dict[key] = int(entry.get())
+            points_dict[key+1] = int(entry.get())
 
         create_database.set_teams(5)
         create_database.set_team_points(points_dict)

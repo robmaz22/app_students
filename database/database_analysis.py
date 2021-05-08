@@ -1,8 +1,15 @@
 import sqlite3
+from database import create_database
 
+database_path = create_database.database_path
+
+def set_db_name(path):
+    global database_path
+    database_path = path
 
 def base_content():
-    con = sqlite3.connect('students.db')
+    global database_path
+    con = sqlite3.connect(database_path)
     cur = con.cursor()
 
     cur.execute('''SELECT name, lname FROM students''')
@@ -12,7 +19,8 @@ def base_content():
 
 
 def highest_score_test(n=3):
-    con = sqlite3.connect('students.db')
+    global database_path
+    con = sqlite3.connect(database_path)
     cur = con.cursor()
 
     cur.execute('''SELECT 
@@ -36,7 +44,8 @@ def highest_score_test(n=3):
     return text
 
 def highest_score_total(n=3):
-    con = sqlite3.connect('students.db')
+    global database_path
+    con = sqlite3.connect(database_path)
     cur = con.cursor()
 
     cur.execute('''SELECT 
