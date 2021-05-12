@@ -58,10 +58,6 @@ class mainWindow:
     # wyświetlenie wyników analizy
     def print_result(self):
 
-        mbox = messagebox.askquestion('Wybór zespółów', 'Czy chcesz wylosować zespoły?\n(Użyj tej opcji jeśli utworzyłeś nową bazę lub zmodyfikowałeś istniejącą)')
-        if mbox == 'yes':
-            teamsWindow()
-
         self.master.geometry('600x500+200+200')
         self.analysis_frame.pack_forget()
 
@@ -97,13 +93,48 @@ class mainWindow:
         else:
             self.create_frame.pack_forget()
 
-
         self.analysis_frame = tk.Frame(self.master, bg='white')
         self.analysis_frame.pack(fill='both', expand=1)
 
-        self.start_button = tk.Button(self.analysis_frame, text='Rozpocznij analizę', command=self.print_result).pack(
+        self.start_button = tk.Button(self.analysis_frame, text='Rozpocznij analizę', command=self.ask_team).pack(
             pady=30)
         self.insert_button = tk.Button(self.analysis_frame, text='Edytuj bazę', command=self.edit_base).pack(pady=10)
+
+    def ask_team(self):
+        mbox = messagebox.askquestion('Wybór zespółów',
+                                      'Czy chcesz wylosować zespoły?\n(Użyj tej opcji jeśli utworzyłeś nową bazę lub zmodyfikowałeś istniejącą)')
+        if mbox == 'yes':
+
+            top = tk.Toplevel(self.master)
+
+            def set_teams():
+
+                points_dict = {}
+
+                for key, entry in enumerate(top_entries):
+                    points_dict[key + 1] = int(entry.get())
+
+                create_database.set_teams(5)
+                create_database.set_team_points(points_dict)
+
+                top.destroy()
+                self.print_result()
+
+            top.geometry('150x150')
+            top.title('Wybór zespołów')
+            top.resizable(False, False)
+            # top_frame = tk.Frame(top, bg='white').pack(fill='both', expand=1)
+            top_entries = [tk.Entry(top, width=5) for _ in range(5)]
+
+            for n, entry in enumerate(top_entries):
+                tk.Label(top, text=f'Zespół {n + 1}').grid(padx=10, column=0, row=n)
+                entry.grid(padx=5, column=1, row=n)
+
+            accept_button = tk.Button(top, text='Zatwierdź', command=set_teams)
+            accept_button.grid(column=0, row=5, columnspan=2)
+
+        else:
+            self.print_result()
 
     def edit_base(self):
         records = create_database.return_database(self.ex_database_path)
@@ -118,36 +149,6 @@ class mainWindow:
             self.start_analysis(False)
         else:
             return
-
-
-class teamsWindow(tk.Toplevel):
-    def __init__(self):
-        tk.Toplevel.__init__(self)
-        self.geometry('150x150')
-        self.title('Wybór zespołów')
-        self.resizable(False, False)
-
-        # self.frame = tk.Frame(self, bg='white').pack(fill='both', expand=1)
-
-        self.entries = [tk.Entry(self, width=5) for _ in range(5)]
-
-        for n, entry in enumerate(self.entries):
-            tk.Label(self, text=f'Zespół {n + 1}').grid(padx=10, column=0, row=n)
-            entry.grid(padx=5, column=1, row=n)
-
-        accept_button = tk.Button(self, text='Zatwierdź', command=self.set_teams)
-        accept_button.grid(column=0, row=5, columnspan=2)
-
-    def set_teams(self):
-
-        points_dict = {}
-
-        for key, entry in enumerate(self.entries):
-            points_dict[key + 1] = int(entry.get())
-
-        create_database.set_teams(5)
-        create_database.set_team_points(points_dict)
-        self.destroy()
 
 
 # Uruchomienie programu

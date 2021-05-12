@@ -72,30 +72,37 @@ def set_teams(n=5):
 
     random.shuffle(teams)
 
-    cur.execute(f'''ALTER TABLE students ADD team INT''')
+    try:
+        cur.execute(f'''IF ALTER TABLE students ADD team INT''')
+    except:
+        pass
 
-    for id, team in enumerate(teams):
-        cur.execute(f'''UPDATE students
+    finally:
+        for id, team in enumerate(teams):
+            cur.execute(f'''UPDATE students
                         SET team = "{team}"
                         WHERE id = "{id}"''')
 
-    con.commit()
-    con.close()
+        con.commit()
+        con.close()
 
 
 def set_team_points(points_dict):
     con = sqlite3.connect(database_path)
     cur = con.cursor()
 
-    cur.execute(f'''ALTER TABLE students ADD t_points INT''')
-
-    for group, pts in points_dict.items():
-        cur.execute(f'''UPDATE students
+    try:
+        cur.execute(f'''ALTER TABLE students ADD t_points INT''')
+    except:
+        pass
+    finally:
+        for group, pts in points_dict.items():
+            cur.execute(f'''UPDATE students
                         SET t_points = "{pts}"
                         WHERE team = {group}''')
 
-    con.commit()
-    con.close()
+        con.commit()
+        con.close()
 
 
 def return_database(path):
