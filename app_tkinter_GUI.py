@@ -26,13 +26,18 @@ class mainWindow:
         self.menu_bar.add_cascade(label="Opcje", menu=self.option_menu)
         self.helpmenu = tk.Menu(self.menu_bar, tearoff=0)
         self.helpmenu.add_command(label="Jak korzystać?")
-        self.helpmenu.add_command(label="O programie...")
+        self.helpmenu.add_command(label="O programie...", command=self.info)
         self.menu_bar.add_cascade(label="Pomoc", menu=self.helpmenu)
 
         self.master.config(menu=self.menu_bar)
 
     # Tworzenie ramki z głównym powitaniem
-    def welcome_screen(self):
+    def welcome_screen(self, flag=False):
+
+        if flag:
+            self.results_frame.pack_forget()
+            self.master.geometry('440x170+200+200')
+
         self.welcome_frame = tk.Frame(self.master, bg='white')
         self.welcome_frame.pack(fill='both', expand=1)
         self.title_label = tk.Label(self.welcome_frame, text="WITAJ W PROGRAMIE DO ANALIZY DANYCH", bg='white')
@@ -43,6 +48,14 @@ class mainWindow:
         self.open_button = tk.Button(self.welcome_frame, text='Otwórz istniejącą bazę danych',
                                      command=self.open_exst_base)
         self.open_button.pack(pady=5)
+
+    # Komunikat o programie
+    def info(self):
+        author = 'Robert'
+        version = 0.5
+
+        msg = f'Program do analizy danych konkursowych.\nAutor: {author}\nWersja: {version}'
+        messagebox.showinfo('O programie', message=msg)
 
     # wybór tworzenia nowej bazy
     def create_new(self):
@@ -58,13 +71,15 @@ class mainWindow:
     # wyświetlenie wyników analizy
     def print_result(self):
 
-        self.master.geometry('600x500+200+200')
+        self.master.geometry('440x500+200+200')
         self.analysis_frame.pack_forget()
 
         self.results_frame = tk.Frame(self.master, bg='white')
         self.results_frame.pack(fill='both', expand=1)
 
-        text_box = tk.Text(self.results_frame, height=15, width=52)
+        self.text_box = tk.Text(self.results_frame, height=15, width=52)
+
+        scrollbar = tk.Scrollbar(self.results_frame, orient=tk.VERTICAL)
 
         self.result = f'{"=" * 52}\n\t\t  UZYSKANE WYNIKI\n{"=" * 52}\n'
         self.result += '* NAJLEPSZY TEST:\n'
@@ -73,9 +88,26 @@ class mainWindow:
         self.result += '\n* NAJLEPSZY WYNIK OGÓLNY:\n'
         self.result += database_analysis.highest_score_total(3)
 
-        text_box.insert(tk.END, self.result)
-        text_box.config(state='disabled')
-        text_box.pack()
+        self.text_box.insert(tk.END, self.result)
+        self.text_box.config(state='disabled')
+        self.text_box.grid(row=0, column=0, padx=(5,0))
+        scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S + tk.W)
+        scrollbar.config(command=self.text_box.yview)
+        self.text_box.config(yscrollcommand = scrollbar.set)
+
+        save_btn = 0
+        graph_button = 0
+
+        save_to_btn = tk.Button(self.results_frame, text='Zapisz jako', command=self.save_result).grid(row=1, column=0)
+        return_btn = tk.Button(self.results_frame, text='Powrót', command=lambda : self.welcome_screen(True)).grid(row=2, column=0)
+
+    def save_result(self):
+        path = filedialog.asksaveasfilename(filetypes=[("Plik tekstowy", "*.txt")])
+
+        with open(path, 'w') as f:
+            f.write(self.text_box.get(1.0, tk.END))
+
+        messagebox.showinfo('Sukces', 'Pomyślnie zapisano plik z wynikami!')
 
     def open_exst_base(self):
         self.ex_database_path = filedialog.askopenfilename(filetypes=[("Database file", "*.db")])
