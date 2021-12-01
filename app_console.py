@@ -250,7 +250,7 @@ class EditScreen:
 
                 self.stdscr.erase()
                 self.stdscr.addstr(
-                    0, 0, 'CURRENT INFORMATION:', curses.color_pair(1))
+                    0, 0, 'TEMPORARY INFORMATION:', curses.color_pair(1))
                 self.stdscr.addstr(1, 0,
                                    str(f'Sex: {new_sex}\n'
                                        f'First Name: {new_name}\n'
@@ -314,6 +314,91 @@ class EditScreen:
         self.stdscr.refresh()
 
 
+def generate_report(stdscr):
+    global header_color
+    global second_header_color
+    global info_color
+    global option_color
+    global higlighted_color
+    global wrong_color
+
+    stdscr.clear()
+
+    base_choices = []
+    advance_choices = {}
+
+    while True:
+        stdscr.clear()
+        stdscr.addstr(0, 0, 'Wybrane opcje:', header_color)
+        stdscr.addstr(1, 0, 'Podstawowa analiza:', second_header_color)
+        counter = 0
+
+        for c in base_choices:
+            stdscr.addstr(2, counter, c)
+            counter += len(c) + 1
+
+        stdscr.addstr(3, 0, 'Zaawansowana analiza:', second_header_color)
+        counter = 0
+        for c in advance_choices.values():
+            stdscr.addstr(4, counter, c)
+            counter += len(c) + 1
+
+        stdscr.addstr(6, 0, 'Best test (Press 1)', option_color)
+        stdscr.addstr(7, 0, 'Best work (Press 2)', option_color)
+        stdscr.addstr(8, 0, 'Best total (Press 3)', option_color)
+        stdscr.addstr(
+            9, 0, 'Sex comparison - advanced (Press 4)', option_color)
+        stdscr.addstr(
+            10, 0, 'City comparison - advanced (Press 5)', option_color)
+
+        stdscr.addstr(curses.LINES - 1, 0,
+                      'Press space to generate report, d to clear analyses, ESC to return', info_color)
+
+        key = stdscr.getkey()
+
+        if key == ' ':
+            if not advance_choices:
+                advance_choices = None
+            if base_choices:
+                report = operations.Report(
+                    'report.docx', base_choices, list(advance_choices))
+                report.add_basic_content()
+                if report.advanced_categories is not None:
+                    report.add_advanced_content()
+                report.save()
+                stdscr.clear()
+                stdscr.addstr(
+                    0, 0, 'Raport generated. Press any key', info_color)
+                stdscr.getkey()
+                break
+            else:
+                stdscr.clear()
+                stdscr.addstr(
+                    0, 0, 'At least one basic analysis should be chosen! Press any key', wrong_color)
+                stdscr.getkey()
+        elif key == 'd':
+            base_choices.clear()
+            advance_choices.clear()
+        elif key == '1':
+            if 'test' not in base_choices:
+                base_choices.append('test')
+        elif key == '2':
+            if 'work' not in base_choices:
+                base_choices.append('work')
+        elif key == '3':
+            if 'total' not in base_choices:
+                base_choices.append('total')
+
+        elif key == '4':
+            if 'sex' not in advance_choices:
+                advance_choices[1] = 'sex'
+        elif key == '5':
+            if 'city' not in advance_choices:
+                advance_choices[2] = 'city'
+        elif ord(key) == 27:
+            break
+
+
 def edit(stdscr):
     stdscr.clear()
     edit_screen = EditScreen(stdscr)
@@ -340,11 +425,12 @@ def how_many_students(stdscr):
         return None
 
 
-def show_function_result(stdscr, func):
+def show_result(stdscr, query):
     how_many = how_many_students(stdscr)
 
     if how_many is not None:
-        students = func(how_many, 'students.db')
+        students = operations.best_results(
+            query, how_many, False, 'students.db')
         stdscr.clear()
         screen = ResultScreen(students, stdscr)
         screen.run()
@@ -455,22 +541,29 @@ def run(stdscr):
         stdscr.addstr(1, 0, 'Please select a category to show',
                       higlighted_color)
         stdscr.addstr(2, 0, 'Best test scores (Press 1)', option_color)
-        stdscr.addstr(3, 0, 'Best total scores (Press 2)', option_color)
-        stdscr.addstr(4, 0, 'Advanced analysis (Press 3)', option_color)
+        stdscr.addstr(3, 0, 'Best work scores (Press 2)', option_color)
+        stdscr.addstr(4, 0, 'Best total scores (Press 3)', option_color)
+        stdscr.addstr(5, 0, 'Advanced analysis (Press 4)', option_color)
         stdscr.addstr(curses.LINES - 1, 0,
-                      'Press space to return, ESC to quit', info_color)
+                      'Press space to return, r to generate report, ESC to quit', info_color)
         stdscr.refresh()
 
         answer = stdscr.getkey()
 
         if answer == '1':
-            show_function_result(stdscr, operations.best_test)
+            show_result(stdscr, 'test')
             stdscr.clear()
         elif answer == '2':
-            show_function_result(stdscr, operations.best_total)
+            show_result(stdscr, 'work')
             stdscr.clear()
         elif answer == '3':
+            show_result(stdscr, 'total')
+            stdscr.clear()
+        elif answer == '4':
             show_advanced(stdscr)
+            stdscr.clear()
+        elif answer == 'r':
+            generate_report(stdscr)
             stdscr.clear()
         elif answer == ' ':
             return
