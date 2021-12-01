@@ -2,7 +2,6 @@ import os
 import random
 import csv
 import argparse as ap
-import sqlite3
 
 
 class Student:
@@ -52,14 +51,15 @@ class Student:
         return self._student_info
 
     def edit(self, new_info):
-        new_info_split = new_info.split(',')
-        self.sex = new_info_split[0]
-        self.name = new_info_split[1]
-        self.last_name = new_info_split[2]
-        self.city = new_info_split[3]
-        self.test_points = new_info_split[4]
-        self.work_points = new_info_split[5]
-        
+        if isinstance(new_info, str):
+            new_info = new_info.split(',')
+        self.sex = new_info[0]
+        self.name = new_info[1]
+        self.last_name = new_info[2]
+        self.city = new_info[3]
+        self.test_points = new_info[4]
+        self.work_points = new_info[5]
+
     def save_mode(self):
         return self.sex, self.name, self.last_name, self.city, self.test_points, self.work_points
 
@@ -74,32 +74,13 @@ def get_args():
     return parser.parse_args()
 
 
-def save_database(db_file, students_list):
-    conn = sqlite3.connect(db_file)
-    cursor = conn.cursor()
-    cursor.execute('DROP TABLE STUDENTS')
-    conn.execute('''CREATE TABLE STUDENTS 
-    (id, sex, first_name, last_name, city, test, work)''')
-
-    for idx, student in enumerate(students_list):
-        info = list(student.save_mode())
-        info.insert(0, idx+1)
-        cursor.execute(f'''INSERT INTO STUDENTS 
-        (id, sex, first_name, last_name, city, test, work)
-        VALUES {info}''')
-
-    print('Database updated successfully!')
-    conn.commit()
-    conn.close()
-
-
 def save_to_csv(output_file, students_list):
     with open(output_file, 'w') as csv_file:
         writer = csv.writer(csv_file)
         for student in students_list:
             writer.writerow(student.save_mode())
 
-    print(f'File {os.path.basename(output_file)} with {output_file} students saved')
+    print(f'File {os.path.basename(output_file)} with {len(students_list)} students saved')
 
 
 def main():
